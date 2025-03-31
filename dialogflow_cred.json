@@ -1,0 +1,13 @@
+{
+    "type": "service_account",
+    "project_id": "weather-01-knma",
+    "private_key_id": "d1252b6dd67204195e47b9305599db56ef7b11a9",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC2iwfs7ccDr831\nDfmhqBf4mAAVOrGfOhTjawQQLV1wGhYTRD+EIHtAcKQfNxUuKel4WEzzWOeVmiHO\noSG9WwODlmjCv7F6Ahn4qHY3EGdkWSu1Yd8XEJ2TdX78GVoHkIwJbxij0xFtNmrT\n82+z3JCgBMc6rCR2cQ5I9pWIXprIcGoNveUxjvn7ZU3lbnGcE4R2ovJsbxavBepu\nf/pjBVWlRmTwOYLxwbmT+D+MhLR/YgKi4QCfAAo5K3DyBT6f7K3MJIAtPN5IZVeB\nyeY4Whvir1YwHCloZh0iyH8PwTysCkZczMQ59pA2YYTiO8r05d7q6OyQAnrz8ybr\nvWJ4j9MrAgMBAAECggEAIye8c4NJkCqz+g1idaEnWK+BWJVQru8jJbcu9aSe+Z90\nf+plZx9QTVVELmTP1e+pcI1k6HrHQvcHqsE6e7rC/v0hGNyNJAeyk8Jx3eHxX5CS\ny+BY9Bq1ljgLKCcDwTAz3/8+2hIkqYlQ4pff+94vFjpFWkXb0dmtHB0tKDG8EnzL\nh4xA49u5y2qSizS0WWGz3Ns7WK79KnN8tzgYBCjAtIlh/UQjLojKfxpSVtLYWqGm\nMWyjSzBVUBeB9SMLn7yHPq5drVSnDXP11TXf+frhnz3hd0SyYbX2YXmJd48xlJya\noUfyeNXBTFBhrNhZ/KMb7hzr83G/s1OKm12Sypp0sQKBgQD9ULf1qzunpKlaQBfO\noSyxvefLUYne5OaoKqOWUpGLijT0k1jzjA6aHGKzJtYXm5pXUn4KTq0Lx/Cfg+Sb\ngsl/c3QVa1uLQRVc3TS5rjPh9Cdw+yX+HGIsfQ257hbS4PRQImBciuPOPNGXVh+9\ngw0wi7LMjzUmuAx9SQfT6yGMuwKBgQC4ekwI0K4YLMLzPAuMZLTCldzo0XHCx2vf\nuhAl3zXRZtU6jzynzd97G3FgCSCwrRjqbDAJov6Y0QyxokZOqRNr8PNDFIF9f6us\nCxu6A/X7QVh9d5uVN0JRbaOWgmlfmukHyQ0HqL2L+GmfvNlGTtN8xAUrykmwvhd8\nHNQesvgkUQKBgQDCQi5w1VmwHBRLQ69+JBe0Tp/9SZBjQEKqX9iHpNY8nkYx8PVb\n/+IKyQ3fuT6haBCaOoaxvNfzmuaqTWj44PlJJe61pljTl5ucVX7jjfX3p1a/y7m8\n/2NCHrxyA2W5Xg29jj87eL9uHzHTzpYUrPVmbxs0x/XItYfOZDz+hOh7lQKBgQCR\nOLz4R4Z1Q29oWQFiULi3YZAYuyAJzEEQSwGBPri4EnKS+cUu9/MQj2btyeGxE2LE\nz8v1GhnAJPkQMQWV0KWYWIK3cMILEGENO2VlRs7yLtvBUVHp4ilTvrKDvj/DYkhF\nt7CJMf2c3T4Q4HJOValI02qasVDXUJ1eN7eIPyz2MQKBgCqJRBttgOFEwpjER1Nm\nslvgNYvb29OFFsZPIoF0K6kJxnvWeE44myzqRa5Ro4wcOJdPRmroEN4ddSru1xeF\n1GihszrPHhxOWvpkAsXcWxvHQWCVYZitGoL6n78tN3izfRegsIdwhxcQQo0xVSQB\nk8RAT7TPVUwcuSsVdvgi9ZS+\n-----END PRIVATE KEY-----\n",
+    "client_email": "streak-dialogflow-account@weather-01-knma.iam.gserviceaccount.com",
+    "client_id": "108840077933798218918",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/streak-dialogflow-account%40weather-01-knma.iam.gserviceaccount.com",
+    "universe_domain": "googleapis.com"
+}
