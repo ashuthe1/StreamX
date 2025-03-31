@@ -74,7 +74,9 @@ class Chat extends Component {
       { username: user, public_key: publicKeyBase64 },
       { withCredentials: true }
     );
-    console.log('Using global key pair:', keyPair);
+    console.log('Using global key pair: ', keyPair);
+    console.log('KyberPublicKey: ', keyPair.publicKey);
+    console.log('KyberPrivateKey: ', keyPair.privateKey);
     this.setState({ kyberKeyPair: keyPair });
 
     // Set up the socket message handler.
@@ -178,13 +180,11 @@ class Chat extends Component {
       timestamp: Math.floor(Date.now() / 1000),
     };
     try {
-      console.log('Storing sender copy:', senderMsg);
       await axios.post(
         `${this.state.endpoint}/store-my-messages`,
         senderMsg,
         { withCredentials: true }
       );
-      console.log('Sender copy stored successfully.');
     } catch (storeError) {
       console.error('Error storing sender copy:', storeError);
     }
@@ -268,12 +268,6 @@ class Chat extends Component {
         const encryptedMessageBytes = this.fromBase64(chat.encrypted_message);
         const ivBytes = this.fromBase64(chat.iv);
         
-        // Log sizes for debugging
-        console.log(`Processing message from ${chat.from} to ${chat.to}`);
-        console.log('encapsulatedBytes length:', encapsulatedBytes.length);
-        console.log('encryptedMessageBytes length:', encryptedMessageBytes.length);
-        console.log('ivBytes length:', ivBytes.length);
-        
         // Ensure we have valid data before decryption
         if (encapsulatedBytes.length === 0 || encryptedMessageBytes.length === 0 || ivBytes.length === 0) {
           console.error('Empty encryption data detected');
@@ -289,7 +283,6 @@ class Chat extends Component {
             privateKey,
             kemInstance
           );
-          console.log('Decapsulated shared secret length:', sharedSecret.length);
         } catch (decapError) {
           console.error('Key decapsulation failed:', decapError);
           chat.decryptedMessage = 'Error: Key decapsulation failed';
@@ -338,8 +331,6 @@ class Chat extends Component {
         { withCredentials: true }
       );
       
-      console.log('Chat history: U1 to U2', res1.data);
-      console.log('Chat history: U2 to U1', res2.data);
   
       let chats1 = res1.status === 200 ? res1.data.chats : [];
       let chats2 = res2.status === 200 ? res2.data.chats : [];
@@ -356,9 +347,6 @@ class Chat extends Component {
       chats2 = chats2.filter(chat => 
         chat && chat.encapsulated_key && chat.encrypted_message && chat.iv);
       
-      console.log(`Processing ${chats1.length} messages from U1 to U2`);
-      console.log(`Processing ${chats2.length} messages from U2 to U1`);
-      
       // Process chats with improved error handling
       const processedChats1 = await this.processChats(
         chats1,
@@ -372,9 +360,7 @@ class Chat extends Component {
       );
       
       const finalChats = [...processedChats1, ...processedChats2];
-      console.log("Final Chats before sorting: ", finalChats);
       finalChats.sort((a, b) => a.timestamp - b.timestamp);
-      console.log("Final Chats after sorting: ", finalChats);
       
       this.setState({ chats: finalChats });
       this.renderChatHistory(u1, finalChats);

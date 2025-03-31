@@ -56,11 +56,9 @@ class Register extends Component {
         },
         { withCredentials: true }
       );
-      console.log('register response', res);
       if (res.status) {
         // Generate the global key pair (only created once).
         const keyPair = await getGlobalKeyPair();
-        console.log('Global key pair:', keyPair);
         
         // Convert private key (assumed Uint8Array) to a Base64 string.
         const privateKeyBase64 = btoa(String.fromCharCode(...keyPair.privateKey));

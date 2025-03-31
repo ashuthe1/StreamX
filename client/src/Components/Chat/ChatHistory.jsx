@@ -24,9 +24,7 @@ const ChatHistory = (currentUser, chats) => {
     const alignSelf = isCurrentUser ? 'flex-end' : 'flex-start';
     const bg = isCurrentUser ? 'purple.500' : 'gray.600';
     const textAlign = isCurrentUser ? 'right' : 'left';
-    console.log("TimeStamp: ", m.timestamp * 1000)
     const ts = new Date(m.timestamp * 1000);
-    console.log("convertedTS: ", ts)
 
     return (
       <Box key={m.id} alignSelf={alignSelf} maxWidth="70%" mb={4}>
