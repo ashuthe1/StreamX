@@ -14,6 +14,9 @@ import {
 import { Link, Navigate } from 'react-router-dom';
 import { EditIcon } from '@chakra-ui/icons';
 
+// Import our singleton key utility.
+import { getGlobalKeyPair } from '../kyber/keyUtils';
+
 class Login extends Component {
   constructor(props) {
     super(props);
