@@ -41,4 +41,5 @@ This is scalable chat website built using Golang, designed to provide real-time 
 #### More features will be added soon. All contributions are welcome :)
 
 rm -rf ~/data/postgresdata
+docker-compose down
 docker-compose up --build
