@@ -91,7 +91,6 @@ class Chat extends Component {
           if (
             this.state.username === msg.to
           ) {
-            console.log('Ashutosh: Received message: ', msg);
           // update UI only when message is between from and to
           var chatsArr = []
           var singleMsg = {
@@ -104,17 +103,13 @@ class Chat extends Component {
             id: msg.id,
             decryptedMessage: '',
           };
-          console.log('ConstructedSingleMsg: ', singleMsg);
           chatsArr.push(singleMsg);
-          console.log('ConstructedChatsArr: ', chatsArr);
           const processedChatMessage = await this.processChats(
             chatsArr,
             this.state.kyberKeyPair.privateKey,
             this.state.kyberKeyPair.kemInstance
           );
-          console.log('ProcessedChatMessage: ', processedChatMessage);
           var allChats = [...this.state.chats, processedChatMessage[0]];
-          console.log("AllChats: ", allChats);
           this.setState({ chats: allChats });
           this.renderChatHistory(this.state.username, allChats);
         }
@@ -269,10 +264,8 @@ class Chat extends Component {
   };
 
   processChats = async (chats, privateKey, kemInstance) => {
-    console.log('Processing chats: ', chats);
     const processed = await Promise.all(chats.map(async chat => {
       try {
-        console.log('Processing chat: ', chat);
         // Add additional validation before decryption
         if (!chat.encapsulated_key || !chat.encrypted_message || !chat.iv) {
           console.error('Missing required encryption fields in chat:', chat);
