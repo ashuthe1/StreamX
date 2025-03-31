@@ -113,7 +113,7 @@ class Chat extends Component {
             this.state.kyberKeyPair.kemInstance
           );
           console.log('ProcessedChatMessage: ', processedChatMessage);
-          var allChats = [...this.state.chats, processedChatMessage];
+          var allChats = [...this.state.chats, processedChatMessage[0]];
           console.log("AllChats: ", allChats);
           this.setState({ chats: allChats });
           this.renderChatHistory(this.state.username, allChats);
