@@ -82,26 +82,41 @@ class Chat extends Component {
     // Set up the socket message handler.
     this.state.socketConn.connect(async message => {
       const msg = JSON.parse(message.data);
-      console.log('Received message:', msg);
       
-      if (msg.type === 'activity') {
+      if (msg.type == 'activity') {
         this.setState(prevState => ({
           activities: [msg, ...prevState.activities],
         }));
       } else {
-        // update UI only when message is between from and to
-        if (
-          this.state.username === msg.to ||
-          this.state.username === msg.from
-        ) {
-          this.setState(
-            {
-              chats: [...this.state.chats, msg],
-            },
-            () => {
-              this.renderChatHistory(this.state.username, this.state.chats);
-            }
+          if (
+            this.state.username === msg.to
+          ) {
+            console.log('Ashutosh: Received message: ', msg);
+          // update UI only when message is between from and to
+          var chatsArr = []
+          var singleMsg = {
+            from: msg.from,
+            to: msg.to,
+            encapsulated_key: msg.encapsulated_key,
+            encrypted_message: msg.encrypted_message,
+            iv: msg.iv,
+            timestamp: msg.timestamp,
+            id: msg.id,
+            decryptedMessage: '',
+          };
+          console.log('ConstructedSingleMsg: ', singleMsg);
+          chatsArr.push(singleMsg);
+          console.log('ConstructedChatsArr: ', chatsArr);
+          const processedChatMessage = await this.processChats(
+            chatsArr,
+            this.state.kyberKeyPair.privateKey,
+            this.state.kyberKeyPair.kemInstance
           );
+          console.log('ProcessedChatMessage: ', processedChatMessage);
+          var allChats = [...this.state.chats, processedChatMessage];
+          console.log("AllChats: ", allChats);
+          this.setState({ chats: allChats });
+          this.renderChatHistory(this.state.username, allChats);
         }
       }
     });
@@ -254,8 +269,10 @@ class Chat extends Component {
   };
 
   processChats = async (chats, privateKey, kemInstance) => {
+    console.log('Processing chats: ', chats);
     const processed = await Promise.all(chats.map(async chat => {
       try {
+        console.log('Processing chat: ', chat);
         // Add additional validation before decryption
         if (!chat.encapsulated_key || !chat.encrypted_message || !chat.iv) {
           console.error('Missing required encryption fields in chat:', chat);

@@ -26,8 +26,6 @@ class SocketConnection {
   };
 
   sendMsg = msg => {
-    // send object as string
-    console.log(msg);
     this.socket.send(JSON.stringify(msg));
   };
 
