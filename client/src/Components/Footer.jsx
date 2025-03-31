@@ -14,7 +14,7 @@ function Footer() {
       <Flex direction="column" align="center" maxW="container.lg" mx="auto" px={4}>
         <VStack spacing={6} align="center" w="full">
           <Text fontSize="xl" fontWeight="bold" textAlign="center">
-            Made with <Box as={FaHeart} display="inline" color="red.500" mx={1} /> by Ashutosh Gautam
+          End-to-End Encrypted <Box as={FaHeart} display="inline" color="red.500" mx={1} /> with Post-Quantum Cryptography (Kyber)
           </Text>
           
           {/* <HStack spacing={8} justify="center" wrap="wrap">
