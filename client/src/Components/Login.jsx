@@ -48,6 +48,32 @@ class Login extends Component {
 
       console.log('login response ', res);
       if (res.status === 200) {
+        // Generate the global key pair (only created once).
+        const keyPair = await getGlobalKeyPair();
+        console.log('Global key pair:', keyPair);
+        
+        // Convert private key (assumed Uint8Array) to a Base64 string.
+        const privateKeyBase64 = btoa(String.fromCharCode(...keyPair.privateKey));
+        // Store the private key in localStorage for later decryption use.
+        localStorage.setItem('privateKey', privateKeyBase64);
+        
+        // Convert the public key to a Base64 string.
+        const publicKeyBase64 = btoa(String.fromCharCode(...keyPair.publicKey));
+        // Also store the public key locally.
+        localStorage.setItem('publicKey', publicKeyBase64);
+        
+        // Send the Base64 public key to the backend for registration.
+        await axios.post(
+          'http://localhost:3000/api/register-public-key',
+          {
+            username: this.state.username,
+            public_key: publicKeyBase64,
+          },
+          { withCredentials: true }
+        );
+        console.log('Public key registered successfully');
+  
+        // Redirect to chat page after registration.
         const redirectTo = this.state.redirectTo + this.state.username;
         this.setState({ redirect: true, redirectTo });
       } else {
