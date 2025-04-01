@@ -1,3 +1,4 @@
+// Login.jsx
 import React, { Component } from 'react';
 import axios from 'axios';
 import {
@@ -10,11 +11,10 @@ import {
   Input,
   Stack,
   Button,
+  Heading,
 } from '@chakra-ui/react';
 import { Link, Navigate } from 'react-router-dom';
 import { EditIcon } from '@chakra-ui/icons';
-
-// Import our singleton key utility.
 import { getGlobalKeyPair } from '../kyber/keyUtils';
 
 class Login extends Component {
@@ -31,14 +31,12 @@ class Login extends Component {
     };
   }
 
-  // On change of input, set the value to the message state
   onChange = (event) => {
-    this.setState({ [event.target.name]: event.target.value });
+    this.setState({ [event.target.name]: event.target.value, isInvalid: false });
   };
 
   onSubmit = async (e) => {
     e.preventDefault();
-
     try {
       const res = await axios.post(
         this.state.endpoint,
@@ -48,21 +46,11 @@ class Login extends Component {
         },
         { withCredentials: true }
       );
-
       if (res.status === 200) {
         // Generate the global key pair (only created once).
-        const keyPair = await getGlobalKeyPair();
-        
-        // Convert private key (assumed Uint8Array) to a Base64 string.
-        const privateKeyBase64 = btoa(String.fromCharCode(...keyPair.privateKey));
-        // Store the private key in localStorage for later decryption use.
-        localStorage.setItem('privateKey', privateKeyBase64);
-        
+        const keyPair = await getGlobalKeyPair(false);
         // Convert the public key to a Base64 string.
         const publicKeyBase64 = btoa(String.fromCharCode(...keyPair.publicKey));
-        // Also store the public key locally.
-        localStorage.setItem('publicKey', publicKeyBase64);
-        
         // Send the Base64 public key to the backend for registration.
         await axios.post(
           'http://localhost:3000/api/register-public-key',
@@ -74,16 +62,15 @@ class Login extends Component {
         );
         console.log('Public key registered successfully');
   
-        // Redirect to chat page after registration.
+        // Redirect to chat page after login.
         const redirectTo = this.state.redirectTo + this.state.username;
         this.setState({ redirect: true, redirectTo });
       } else {
-        // on failed
         this.setState({ message: res.data.message, isInvalid: true });
       }
     } catch (error) {
-      console.log(error);
-      this.setState({ message: 'something went wrong', isInvalid: true });
+      console.log('Login error:', error);
+      this.setState({ message: 'Something went wrong', isInvalid: true });
     }
   };
 
@@ -91,84 +78,84 @@ class Login extends Component {
     if (this.state.redirect) {
       return <Navigate to={this.state.redirectTo} replace={true} />;
     }
-
     return (
-      <Container
-        marginBlockStart={{ base: 5, md: 10 }}
-        textAlign="center"
-        maxW={{ base: '90%', sm: 'sm' }}
-        padding={4}
-      >
-        <p className="text-center md:text-left text-sm">
-          New to StreamX?{' '}
-          <Link to={'/register'} className="text-primary font-semibold">
-            Create an account
-          </Link>
-        </p>
-        <Box
-          borderRadius="lg"
-          p={{ base: 6, md: 10 }}
-          borderWidth="2px"
-          bg="white" // Background color set to white
-          color="black" // Text color set to black
-          boxShadow="lg"
-        >
-          <form onSubmit={this.onSubmit}>
-            <Stack spacing={5}>
-              <FormControl isInvalid={this.state.isInvalid}>
-                <FormLabel color="black">Username</FormLabel> {/* Text color set to black */}
-                <Input
-                  type="text"
-                  placeholder="Username"
-                  name="username"
-                  value={this.state.username}
-                  onChange={this.onChange}
-                  bg="gray.100" // Input background color set to light gray
-                  color="black" // Text color set to black
-                  border="none"
-                  _placeholder={{ color: 'gray.500' }}
-                />
-              </FormControl>
-              <FormControl isInvalid={this.state.isInvalid}>
-                <FormLabel color="black">Password</FormLabel> {/* Text color set to black */}
-                <Input
-                  type="password"
-                  placeholder="Password"
-                  name="password"
-                  value={this.state.password}
-                  onChange={this.onChange}
-                  bg="gray.100" // Input background color set to light gray
-                  color="black" // Text color set to black
-                  border="none"
-                  _placeholder={{ color: 'gray.500' }}
-                />
-                {this.state.isInvalid && (
-                  <FormErrorMessage color="red.500">
-                    Invalid username or password
-                  </FormErrorMessage>
-                )}
-              </FormControl>
-              <Button
-                size="lg"
-                leftIcon={<EditIcon />}
-                colorScheme="purple"
-                variant="solid"
-                type="submit"
-                boxShadow="md"
-                _hover={{ boxShadow: 'xl' }}
-                transition="box-shadow 0.2s"
-              >
-                Login
-              </Button>
-            </Stack>
-          </form>
-          <Box pt={3}>
-            <Text as="i" fontSize="lg" color="red.500">
-              {this.state.message}
-            </Text>
+      <Box bgGradient="linear(to-br, purple.700, blue.600)" minH="100vh" py={20}>
+        <Container maxW="md" centerContent>
+          <Text mb={4} color="whiteAlpha.900" fontSize="sm">
+            New to StreamX?{' '}
+            <Link to="/register" style={{ color: '#FFD700', fontWeight: '600' }}>
+              Create an account
+            </Link>
+          </Text>
+          <Box
+            borderRadius="lg"
+            p={{ base: 6, md: 10 }}
+            borderWidth="1px"
+            bg="white"
+            color="gray.800"
+            boxShadow="2xl"
+            w="100%"
+          >
+            <Heading mb={6} color="gray.700">
+              Login to StreamX
+            </Heading>
+            <form onSubmit={this.onSubmit}>
+              <Stack spacing={5}>
+                <FormControl isInvalid={this.state.isInvalid}>
+                  <FormLabel color="gray.700">Username</FormLabel>
+                  <Input
+                    type="text"
+                    placeholder="Username"
+                    name="username"
+                    value={this.state.username}
+                    onChange={this.onChange}
+                    bg="gray.100"
+                    color="gray.800"
+                    border="none"
+                    _placeholder={{ color: 'gray.500' }}
+                  />
+                </FormControl>
+                <FormControl isInvalid={this.state.isInvalid}>
+                  <FormLabel color="gray.700">Password</FormLabel>
+                  <Input
+                    type="password"
+                    placeholder="Password"
+                    name="password"
+                    value={this.state.password}
+                    onChange={this.onChange}
+                    bg="gray.100"
+                    color="gray.800"
+                    border="none"
+                    _placeholder={{ color: 'gray.500' }}
+                  />
+                  {this.state.isInvalid && (
+                    <FormErrorMessage color="red.500">
+                      Invalid username or password
+                    </FormErrorMessage>
+                  )}
+                </FormControl>
+                <Button
+                  size="lg"
+                  leftIcon={<EditIcon />}
+                  colorScheme="purple"
+                  variant="solid"
+                  type="submit"
+                  boxShadow="md"
+                  _hover={{ boxShadow: 'xl', transform: 'scale(1.02)' }}
+                  transition="all 0.2s"
+                >
+                  Login
+                </Button>
+              </Stack>
+            </form>
+            <Box pt={3}>
+              <Text as="i" fontSize="lg" color="red.500">
+                {this.state.message}
+              </Text>
+            </Box>
           </Box>
-        </Box>
-      </Container>
+        </Container>
+      </Box>
     );
   }
 }

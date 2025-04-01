@@ -20,9 +20,6 @@ import {
 import { EditIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { FaUserPlus } from 'react-icons/fa';
 import { Link, Navigate } from 'react-router-dom';
-import './styles.css';
-
-// Import our singleton key utility.
 import { getGlobalKeyPair } from '../kyber/keyUtils';
 
 class Register extends Component {
@@ -41,13 +38,12 @@ class Register extends Component {
   }
 
   onChange = (event) => {
-    this.setState({ [event.target.name]: event.target.value });
+    this.setState({ [event.target.name]: event.target.value, isInvalid: false });
   };
 
   onSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Register the user with the backend.
       const res = await axios.post(
         this.state.endpoint,
         {
@@ -58,18 +54,9 @@ class Register extends Component {
       );
       if (res.status) {
         // Generate the global key pair (only created once).
-        const keyPair = await getGlobalKeyPair();
-        
-        // Convert private key (assumed Uint8Array) to a Base64 string.
-        const privateKeyBase64 = btoa(String.fromCharCode(...keyPair.privateKey));
-        // Store the private key in localStorage for later decryption use.
-        localStorage.setItem('privateKey', privateKeyBase64);
-        
+        const keyPair = await getGlobalKeyPair(false);
         // Convert the public key to a Base64 string.
         const publicKeyBase64 = btoa(String.fromCharCode(...keyPair.publicKey));
-        // Also store the public key locally.
-        localStorage.setItem('publicKey', publicKeyBase64);
-        
         // Send the Base64 public key to the backend for registration.
         await axios.post(
           'http://localhost:3000/api/register-public-key',
@@ -102,33 +89,33 @@ class Register extends Component {
       return <Navigate to={this.state.redirectTo} replace={true} />;
     }
     return (
-      <Box bg="white" minH="100vh" py={20}>
+      <Box bgGradient="linear(to-br, purple.700, blue.600)" minH="100vh" py={20}>
         <Container maxW="md">
           <VStack spacing={8} align="stretch">
             <VStack spacing={2} align="center">
-              <Icon as={FaUserPlus} w={10} h={10} color="purple.400" />
-              <Heading color="black">Create Your Account</Heading>
-              <Text color="black">Join StreamX and start chatting today!</Text>
+              <Icon as={FaUserPlus} w={10} h={10} color="yellow.300" />
+              <Heading color="white">Create Your Account</Heading>
+              <Text color="whiteAlpha.900">Join StreamX and start chatting today!</Text>
             </VStack>
-            <p className="text-center md:text-left text-sm">
-              Already have an account?{" "}
-              <Link to={"/login"} className="text-primary font-semibold">
+            <Text textAlign="center" color="whiteAlpha.900" fontSize="sm">
+              Already have an account?{' '}
+              <Link to="/login" style={{ color: '#FFD700', fontWeight: '600' }}>
                 Sign In
               </Link>
-            </p>
-            <Box bg="white" borderRadius="xl" p={8} boxShadow="xl">
+            </Text>
+            <Box bg="white" borderRadius="xl" p={8} boxShadow="2xl">
               <form onSubmit={this.onSubmit}>
                 <Stack spacing={6}>
                   <FormControl isInvalid={this.state.isInvalid}>
-                    <FormLabel color="black">Username</FormLabel>
+                    <FormLabel color="gray.700">Username</FormLabel>
                     <Input
                       type="text"
-                      placeholder="Enter your username (no special char)"
+                      placeholder="Enter your username"
                       name="username"
                       value={this.state.username}
                       onChange={this.onChange}
                       bg="gray.100"
-                      color="black"
+                      color="gray.800"
                       border="none"
                       _placeholder={{ color: 'gray.500' }}
                       _focus={{
@@ -141,7 +128,7 @@ class Register extends Component {
                     )}
                   </FormControl>
                   <FormControl>
-                    <FormLabel color="black">Password</FormLabel>
+                    <FormLabel color="gray.700">Password</FormLabel>
                     <InputGroup>
                       <Input
                         type={this.state.showPassword ? 'text' : 'password'}
@@ -150,7 +137,7 @@ class Register extends Component {
                         value={this.state.password}
                         onChange={this.onChange}
                         bg="gray.100"
-                        color="black"
+                        color="gray.800"
                         border="none"
                         _placeholder={{ color: 'gray.500' }}
                         _focus={{
@@ -166,9 +153,9 @@ class Register extends Component {
                           bg="transparent"
                         >
                           {this.state.showPassword ? (
-                            <ViewOffIcon color="black" />
+                            <ViewOffIcon color="gray.700" />
                           ) : (
-                            <ViewIcon color="black" />
+                            <ViewIcon color="gray.700" />
                           )}
                         </Button>
                       </InputRightElement>
@@ -180,6 +167,7 @@ class Register extends Component {
                     variant="solid"
                     type="submit"
                     size="lg"
+                    _hover={{ transform: 'scale(1.02)' }}
                   >
                     Register
                   </Button>

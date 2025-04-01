@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import SearchBar from '../Searchbar';
 import SocketConnection from '../../socket-connection';
-import ActivityPage from '../Activitypage';
+import ConfigPage from '../ConfigPage';
 
 import {
   Box,
@@ -32,7 +32,7 @@ import ContactList from './ContactList';
 
 // Import the Kyber crypto module and our singleton utility.
 import * as KyberCrypto from '../../kyber/kyberCrypto';
-import { getGlobalKeyPair } from '../../kyber/keyUtils';
+import { getGlobalKeyPair} from '../../kyber/keyUtils';
 class Chat extends Component {
   constructor(props) {
     super(props);
@@ -65,7 +65,9 @@ class Chat extends Component {
     const conn = new SocketConnection();
     await this.setState({ socketConn: conn });
 
-    // Use the singleton utility to get the global key pair.
+   // Use the singleton utility to get (or load) the global key pair.
+    // This function attempts to load keys from a file (e.g., "KyberConfig.json")
+    // if they exist; otherwise, it generates new ones.
     const keyPair = await getGlobalKeyPair();
     // Update the backend with your public key so that others can fetch your current key.
     const publicKeyBase64 = btoa(String.fromCharCode(...keyPair.publicKey));
@@ -74,9 +76,7 @@ class Chat extends Component {
       { username: user, public_key: publicKeyBase64 },
       { withCredentials: true }
     );
-    console.log('Using global key pair: ', keyPair);
-    console.log('KyberPublicKey: ', keyPair.publicKey);
-    console.log('KyberPrivateKey: ', keyPair.privateKey);
+
     this.setState({ kyberKeyPair: keyPair });
 
     // Set up the socket message handler.
@@ -432,7 +432,7 @@ class Chat extends Component {
           <Tabs isFitted variant="enclosed" colorScheme="purple" flex={1}>
             <TabList>
               <Tab>Chat</Tab>
-              <Tab>Activities</Tab>
+              <Tab>Configuration</Tab>
             </TabList>
             <TabPanels>
               <TabPanel p={0}>
@@ -504,7 +504,7 @@ class Chat extends Component {
                 </Flex>
               </TabPanel>
               <TabPanel>
-                <ActivityPage activities={activities} />
+                <ConfigPage username={this.state.username}/>
               </TabPanel>
             </TabPanels>
           </Tabs>

@@ -20,7 +20,6 @@ import Register from './Components/Register';
 import Login from './Components/Login';
 import Chat from './Components/Chat/Chat';
 import Footer from './Components/Footer';
-import ActivityPage from './Components/Activitypage';
 
 // theme.styles.global['font-family'] = 'roboto';
 function MainLayout({ children }) {
@@ -64,14 +63,6 @@ function App() {
                 element={
                   <MainLayout>
                     <Chat />
-                  </MainLayout>
-                }
-              />
-              <Route
-                path="/activity"
-                element={
-                  <MainLayout>
-                    <ActivityPage />
                   </MainLayout>
                 }
               />

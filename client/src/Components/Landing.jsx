@@ -1,106 +1,125 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Box, Button, Container, Flex, Grid, Heading, Text, Stack, 
-  Icon, VStack, HStack, useColorModeValue, Image
+import {
+  Box,
+  Button,
+  Container,
+  Grid,
+  Heading,
+  Text,
+  VStack,
+  Stack,
+  Icon,
+  useBreakpointValue,
 } from '@chakra-ui/react';
-import { FaRobot, FaSearch, FaFileAlt, FaUserFriends } from 'react-icons/fa';
+import { FaRobot, FaLock, FaFileAlt, FaComments } from 'react-icons/fa';
 import { ArrowForwardIcon } from '@chakra-ui/icons';
-// import animeGirlsBackground from '../assets/animeGirlsBackground.png'; // Import the image
 
-const Feature = ({ title, text, icon }) => {
+const FeatureCard = ({ title, text, icon }) => {
   return (
-    <VStack 
-      align="center" 
-      spacing={4} 
-      bg="whiteAlpha.100" 
-      p={6} 
-      borderRadius="lg" 
-      border="2px solid black"  // Add black border
-      transition="all 0.3s"
-      boxShadow="0 20px 20px rgba(0, 0, 0, 0.4)"  // Enhanced box shadow
-      _hover={{ transform: 'translateY(-10px)', boxShadow: '0 50px 50px rgba(0, 0, 0, 0.5)', cursor:'pointer' }}  // Enhanced hover effect
+    <Box
+      bg="white"
+      borderRadius="xl"
+      p={8}
+      shadow="lg"
+      border="1px solid"
+      borderColor="gray.200"
+      transition="transform 0.3s, box-shadow 0.3s"
+      _hover={{
+        transform: 'translateY(-5px)',
+        boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)',
+      }}
     >
-      <Icon as={icon} w={10} h={10} color="purple.400" />
-      <Text fontWeight="bold" fontSize="xl" textAlign="center" color="blackAlpha.900">{title}</Text>
-      <Text textAlign="center" color="blackAlpha.900">{text}</Text>
-    </VStack>
+      <VStack spacing={4} align="center">
+        <Icon as={icon} boxSize={12} color="purple.500" />
+        <Heading as="h3" size="md" textAlign="center" color="gray.800">
+          {title}
+        </Heading>
+        <Text textAlign="center" color="gray.600">
+          {text}
+        </Text>
+      </VStack>
+    </Box>
   );
 };
 
 function Landing() {
-  const accentColor = 'purple.400';
+  // Responsive grid columns: 1 column on small screens, 2 on larger screens.
+  const gridColumns = useBreakpointValue({ base: 1, md: 2 });
 
   return (
-    <Box bg="white" color="blackAlpha.900"> {/* Main container background color set to white and text color to black */}
-      <Box 
-        // backgroundImage={`url(${animeGirlsBackground})`}
-        // backgroundPosition="center"
-        // backgroundRepeat="no-repeat"
-        // backgroundSize="cover"
-      >
-        <Box bg="rgba(47, 51, 73, 0.85)" py={20} minHeight="80vh" display="flex" alignItems="center">
-          <Container maxW="container.xl">
-            <VStack spacing={8} align="center" textAlign="center" color="white">
-              <Heading as="h1" size="3xl" lineHeight="shorter" color="white">
-                Welcome to <Text as="span" color={accentColor}>StreamX</Text>
-              </Heading>
-              <Text fontSize="xl" maxW="2xl">
-                Experience the future of communication with our AI-powered chat platform. 
-                Connect, share, and discover with unprecedented ease and intelligence.
-              </Text>
-              <Stack direction={{ base: "column", sm: "row" }} spacing={4} pt={4}>
-                <Button 
-                  as={Link} 
-                  to="/register" 
-                  size="lg" 
-                  colorScheme="purple" 
-                  rightIcon={<ArrowForwardIcon />}
-                >
-                  Register
-                </Button>
-                <Button 
-                  as={Link} 
-                  to="/login" 
-                  size="lg" 
-                  variant="outline" 
-                  colorScheme="purple"
-                >
-                  Login
-                </Button>
-              </Stack>
-            </VStack>
-          </Container>
-        </Box>
+    <Box bgGradient="linear(to-br, gray.900, purple.800)" minH="100vh">
+      {/* Hero Section */}
+      <Box py={20} textAlign="center">
+        <Container maxW="container.xl">
+          <VStack spacing={6}>
+            <Heading
+              as="h1"
+              size="2xl"
+              fontWeight="extrabold"
+              color="white"
+              textShadow="2px 2px 4px rgba(0, 0, 0, 0.4)"
+            >
+              Welcome to <Text as="span" color="yellow.300">StreamX</Text>
+            </Heading>
+            <Text fontSize="xl" color="gray.200" maxW="2xl">
+              Experience the next generation of communication with AI-powered chat, post-quantum security, and
+              scalable real-time interactions.
+            </Text>
+            <Stack direction={{ base: 'column', sm: 'row' }} spacing={4}>
+              <Button
+                as={Link}
+                to="/register"
+                size="lg"
+                colorScheme="yellow"
+                variant="solid"
+                rightIcon={<ArrowForwardIcon />}
+                _hover={{ transform: 'scale(1.05)' }}
+              >
+                Register
+              </Button>
+              <Button
+                as={Link}
+                to="/login"
+                size="lg"
+                variant="outline"
+                colorScheme="yellow"
+                _hover={{ transform: 'scale(1.05)' }}
+              >
+                Login
+              </Button>
+            </Stack>
+          </VStack>
+        </Container>
       </Box>
 
       {/* Features Section */}
-      <Box py={20} bg="white"> {/* Features section background color set to white */}
+      <Box py={20} bg="gray.50">
         <Container maxW="container.xl">
-          <VStack spacing={16}>
-            <Heading as="h2" size="xl" textAlign="center" color="blackAlpha.900">
+          <VStack spacing={10}>
+            <Heading as="h2" size="xl" textAlign="center" color="gray.800">
               Why Choose StreamX?
             </Heading>
-            <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={8}>
-              <Feature 
-                icon={FaUserFriends}
-                title="Real-time Chat"
-                text="Connect instantly with friends and colleagues through our lightning-fast chat system."
+            <Grid templateColumns={`repeat(${gridColumns}, 1fr)`} gap={10}>
+              <FeatureCard
+                icon={FaComments}
+                title="Real-Time Chat"
+                text="Experience lightning-fast conversations powered by a scalable architecture using Kafka and RabbitMQ."
               />
-              <Feature 
-                icon={FaFileAlt}
-                title="File Sharing"
-                text="Share files effortlessly during your conversations, enhancing collaboration."
+              <FeatureCard
+                icon={FaLock}
+                title="Post-Quantum Security"
+                text="Leverage Kyber-Post Quantum Cryptography to secure your communications against future threats."
               />
-              <Feature 
+              <FeatureCard
                 icon={FaRobot}
-                title="AI Chatbot"
-                text="Get instant answers and assistance from our intelligent AI chatbot companion."
+                title="AI Chatbot & Semantic Search"
+                text="Interact with our intelligent AI assistant that uses Dialogflow for intent detection, delivers LLM responses, supports weather queries and standard API calls, and features semantic search."
               />
-              <Feature 
-                icon={FaSearch}
-                title="Semantic Search"
-                text="Find past conversations and information with our powerful semantic search feature."
+              <FeatureCard
+                icon={FaFileAlt}
+                title="Secure File Sharing"
+                text="Share your files seamlessly while ensuring data integrity with advanced encryption protocols."
               />
             </Grid>
           </VStack>
@@ -108,24 +127,25 @@ function Landing() {
       </Box>
 
       {/* Call to Action Section */}
-      <Box bg="white" py={20}> {/* Call to action section background color set to white */}
+      <Box py={20} textAlign="center">
         <Container maxW="container.xl">
-          <VStack spacing={8} textAlign="center">
-            <Heading as="h2" size="xl" color="blackAlpha.900">
+          <VStack spacing={6}>
+            <Heading as="h2" size="xl" color="white">
               Ready to Transform Your Communication?
             </Heading>
-            <Text fontSize="lg" maxW="2xl" color="blackAlpha.900">
-              Join 100+ users already experiencing the power of StreamX.
-              Start your journey to smarter, more efficient communication today.
+            <Text fontSize="lg" color="gray.200" maxW="2xl">
+              Join hundreds of users who trust StreamX for secure, scalable, and intelligent communication solutions.
             </Text>
-            <Button 
-              as={Link} 
-              to="/register" 
-              size="lg" 
-              colorScheme="purple" 
+            <Button
+              as={Link}
+              to="/register"
+              size="lg"
+              colorScheme="yellow"
+              variant="solid"
               rightIcon={<ArrowForwardIcon />}
+              _hover={{ transform: 'scale(1.05)' }}
             >
-              Start Your Stream Today
+              Get Started Today
             </Button>
           </VStack>
         </Container>
