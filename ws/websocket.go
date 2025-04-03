@@ -483,7 +483,7 @@ func StartWebSocketServer() {
 	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://localhost:4000",
+		AllowOrigins:     "http://frontend:4000, http://localhost:4000, http://host.docker.internal:4000, http://34.93.63.218:4000, http://10.160.0.2:4000 ",
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
 		AllowCredentials: true,
 	}))
