@@ -43,3 +43,6 @@ This is scalable chat website built using Golang, designed to provide real-time 
 rm -rf ~/data/postgresdata
 docker-compose down
 docker-compose up --build
+
+GCP:
+sudo rm -rf /root/data/postgresdata
