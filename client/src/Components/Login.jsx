@@ -25,7 +25,7 @@ class Login extends Component {
       password: '',
       message: '',
       isInvalid: false,
-      endpoint: 'http://localhost:3000/api/login',
+      endpoint: process.env.REACT_APP_API_URL,
       redirect: false,
       redirectTo: '/chat?u=',
     };
@@ -39,7 +39,7 @@ class Login extends Component {
     e.preventDefault();
     try {
       const res = await axios.post(
-        this.state.endpoint,
+        `${this.state.endpoint}/login`,
         {
           username: this.state.username,
           password: this.state.password,
@@ -53,7 +53,7 @@ class Login extends Component {
         const publicKeyBase64 = btoa(String.fromCharCode(...keyPair.publicKey));
         // Send the Base64 public key to the backend for registration.
         await axios.post(
-          'http://localhost:3000/api/register-public-key',
+          `${this.state.endpoint}/register-public-key`,
           {
             username: this.state.username,
             public_key: publicKeyBase64,

@@ -1,6 +1,8 @@
 class SocketConnection {
   constructor() {
-    this.socket = new WebSocket(`ws://localhost:3001`);
+    const WS_URL = process.env.REACT_APP_WS_URL;
+    console.log('WS_URL: ', WS_URL);
+    this.socket = new WebSocket(WS_URL);
   }
 
   connect = cb => {

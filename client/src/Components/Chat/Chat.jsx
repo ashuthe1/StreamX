@@ -41,7 +41,7 @@ class Chat extends Component {
       username: '',
       message: '',
       to: '',
-      endpoint: 'http://localhost:3000/api',
+      endpoint: process.env.REACT_APP_API_URL,
       contacts: [],
       renderContactList: [],
       chats: [],
