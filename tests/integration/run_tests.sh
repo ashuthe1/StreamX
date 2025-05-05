@@ -25,7 +25,7 @@ start_all=$(date +%s.%N)
 
 for i in $(seq 1 $TOTAL); do
   name="${tests[$((i-1))]}"
-  echo -e "$(tput setaf 4)Integration Test $i/$TOTAL: $name$(tput sgr0)"
+  echo "$(tput setaf 4)Integration Test $i/$TOTAL: $name$(tput sgr0)"
 
   # record start time (fractional)
   t_start=$(date +%s.%N)
