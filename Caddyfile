@@ -9,14 +9,14 @@
     reverse_proxy go-app:3001
 }
 
-chat.gautamashutosh.com {
-    reverse_proxy frontend:4000
-}
+# chat.gautamashutosh.com {
+#     reverse_proxy frontend:4000
+# }
 
-api.gautamashutosh.com {
-    reverse_proxy go-app:3000
-}
+# api.gautamashutosh.com {
+#     reverse_proxy go-app:3000
+# }
 
-ws.gautamashutosh.com {
-    reverse_proxy go-app:3001
-}
+# ws.gautamashutosh.com {
+#     reverse_proxy go-app:3001
+# }
