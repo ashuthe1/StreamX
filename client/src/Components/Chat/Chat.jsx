@@ -208,34 +208,51 @@ class Chat extends Component {
     ) {
       e.preventDefault();
       // Fetch the recipient's public key.
-      const recipientPublicKey = await this.getRecipientPublicKey(this.state.to);
-      const { encapsulated, sharedSecret } = await KyberCrypto.encapsulateKey(
-        recipientPublicKey
-      );
-      const { cipherText, iv } = await KyberCrypto.symmetricEncrypt(
-        this.state.message,
-        sharedSecret
-      );
-      console.log('Encapsulated key:', encapsulated);
-      console.log('Shared secret:', sharedSecret);
-      console.log('Cipher text:', cipherText);
-      console.log('IV:', iv);
-      const encapsulatedB64 = this.toBase64(encapsulated);
-      const cipherTextB64 = this.toBase64(cipherText);
-      const ivB64 = this.toBase64(iv);
-      const msg = {
-        type: 'message',
-        chat: {
-          from: this.state.username,
-          to: this.state.to,
-          encapsulated_key: encapsulatedB64,
-          encrypted_message: cipherTextB64,
-          iv: ivB64,
-        },
-      };
-      console.log('Sending encrypted message:', msg);
-      this.state.socketConn.sendMsg(msg);
+      if(this.state.to == 'ChatBot') {
+        const msg = {
+          type: 'message',
+          chat: {
+            from: this.state.username,
+            to: this.state.to,
+            message: this.state.message,
+            timestamp: Math.floor(Date.now() / 1000),
+          },
+        };
+
+        console.log('Sending direct message to ChatBot:', msg);
+        this.state.socketConn.sendMsg(msg);
+      } else {
+        const recipientPublicKey = await this.getRecipientPublicKey(this.state.to);
+        const { encapsulated, sharedSecret } = await KyberCrypto.encapsulateKey(
+          recipientPublicKey
+        );
+        const { cipherText, iv } = await KyberCrypto.symmetricEncrypt(
+          this.state.message,
+          sharedSecret
+        );
+        console.log('Encapsulated key:', encapsulated);
+        console.log('Shared secret:', sharedSecret);
+        console.log('Cipher text:', cipherText);
+        console.log('IV:', iv);
+        const encapsulatedB64 = this.toBase64(encapsulated);
+        const cipherTextB64 = this.toBase64(cipherText);
+        const ivB64 = this.toBase64(iv);
+        const msg = {
+          type: 'message',
+          chat: {
+            from: this.state.username,
+            to: this.state.to,
+            encapsulated_key: encapsulatedB64,
+            encrypted_message: cipherTextB64,
+            iv: ivB64,
+          },
+        };
+        console.log('Sending encrypted message:', msg);
+        this.state.socketConn.sendMsg(msg);
+      }
+
       await this.storeSenderCopy(this.state.message);
+      
       const newChat = {
         from: this.state.username,
         to: this.state.to,
@@ -266,6 +283,12 @@ class Chat extends Component {
   processChats = async (chats, privateKey, kemInstance) => {
     const processed = await Promise.all(chats.map(async chat => {
       try {
+
+        if(chat.message) { // if the message is not encrypted return it directly (Example message sent to ChatBot)
+          chat.decryptedMessage = chat.message;
+          return chat;
+        }
+
         // Add additional validation before decryption
         if (!chat.encapsulated_key || !chat.encrypted_message || !chat.iv) {
           console.error('Missing required encryption fields in chat:', chat);
@@ -351,11 +374,11 @@ class Chat extends Component {
         return;
       }
       
-      // Validate chats before processing
-      chats1 = chats1.filter(chat => 
-        chat && chat.encapsulated_key && chat.encrypted_message && chat.iv);
-      chats2 = chats2.filter(chat => 
-        chat && chat.encapsulated_key && chat.encrypted_message && chat.iv);
+      // No need to validate chats before processing
+      // chats1 = chats1.filter(chat => 
+      //   chat && chat.encapsulated_key && chat.encrypted_message && chat.iv);
+      // chats2 = chats2.filter(chat => 
+      //   chat && chat.encapsulated_key && chat.encrypted_message && chat.iv);
       
       // Process chats with improved error handling
       const processedChats1 = await this.processChats(
