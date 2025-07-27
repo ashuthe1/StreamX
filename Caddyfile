@@ -9,14 +9,14 @@
 #     reverse_proxy go-app:3001
 # }
 
-chatx.gautamashutosh.com {
+chat.gautamashutosh.com {
     reverse_proxy frontend:4000
 }
 
-apix.gautamashutosh.com {
+api.gautamashutosh.com {
     reverse_proxy go-app:3000
 }
 
-wsx.gautamashutosh.com {
+ws.gautamashutosh.com {
     reverse_proxy go-app:3001
 }
