@@ -252,7 +252,7 @@ class Chat extends Component {
       }
 
       await this.storeSenderCopy(this.state.message);
-      
+
       const newChat = {
         from: this.state.username,
         to: this.state.to,
@@ -284,6 +284,7 @@ class Chat extends Component {
     const processed = await Promise.all(chats.map(async chat => {
       try {
 
+        console.log("Current Message: ", chat)
         if(chat.message) { // if the message is not encrypted return it directly (Example message sent to ChatBot)
           chat.decryptedMessage = chat.message;
           return chat;
