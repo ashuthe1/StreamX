@@ -55,9 +55,9 @@ func WebhookHandler(c *fiber.Ctx) error {
 	var statusCode int
 
 	switch intent := dfRequest.QueryResult.Intent.DisplayName; intent {
-	// case "get-country-news":
-	// 	countryCode := dfRequest.QueryResult.Parameters.GeoCountryCode.Alpha2
-	// 	res, statusCode, err = getNews(countryCode)
+	case "get-country-news":
+		countryCode := dfRequest.QueryResult.Parameters.GeoCountryCode.Alpha2
+		res, statusCode, err = getNews(countryCode)
 	case "get-weather":
 		city := dfRequest.QueryResult.Parameters.City
 		res, statusCode, err = getWeather(city, dfRequest.QueryResult.QueryText)
@@ -69,7 +69,6 @@ func WebhookHandler(c *fiber.Ctx) error {
 		log.Printf("No valid intent provided : %s", intent)
 		err = fmt.Errorf("no valid intent provided : %s", intent)
 		statusCode = http.StatusBadRequest
-
 	}
 
 	if err != nil {
