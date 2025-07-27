@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -143,37 +144,77 @@ func getWeather(city string, question string) (interface{}, int, error) {
 
 func getNews(countryCode string) (interface{}, int, error) {
 	if countryCode == "" {
-		return "", http.StatusBadRequest, fmt.Errorf("no country code provided : %v", countryCode)
+		return "", http.StatusBadRequest, fmt.Errorf("no country code provided: %q", countryCode)
 	}
 
-	newsUrl := fmt.Sprintf("https://newsapi.org/v2/top-headlines?country=%s&apiKey=%s", countryCode, NewsAPIkey)
-
+	newsUrl := fmt.Sprintf(
+		"https://newsapi.org/v2/top-headlines?country=%s&apiKey=%s",
+		countryCode, NewsAPIkey,
+	)
 	req, err := http.NewRequest(http.MethodGet, newsUrl, nil)
 	if err != nil {
-		log.Println("couldn't create request")
+		log.Println("couldn't create request:", err)
 		return nil, http.StatusInternalServerError, err
 	}
 
-	res, err := http.DefaultClient.Do(req)
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Printf("error making get request :%s", err)
+		log.Printf("error making GET request: %s", err)
 		return nil, http.StatusInternalServerError, err
 	}
-	resBody, err := io.ReadAll(res.Body)
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Printf("error ,couldnt read response body :%s", err)
-		return "", http.StatusInternalServerError, err
+		log.Printf("couldn't read response body: %s", err)
+		return nil, http.StatusInternalServerError, err
 	}
 
-	var response interface{}
-	err = json.Unmarshal(resBody, &response)
-	if err != nil {
-		log.Printf("error while unmarshalling the response : %s", err.Error())
-		return "", http.StatusInternalServerError, err
+	// Unmarshal into a map so we don't need tons of models
+	var apiResp map[string]interface{}
+	if err := json.Unmarshal(body, &apiResp); err != nil {
+		log.Printf("error unmarshalling response: %s", err)
+		return nil, http.StatusInternalServerError, err
 	}
 
-	return response, http.StatusOK, nil
+	// Extract articles
+	rawArticles, ok := apiResp["articles"].([]interface{})
+	if !ok || len(rawArticles) == 0 {
+		return "Sorry, I couldn't find any news for that country.", http.StatusOK, nil
+	}
 
+	// Build minimal slice of title+50‑word descriptions
+	var items []map[string]string
+	for _, ra := range rawArticles {
+		art, ok := ra.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		title, _ := art["title"].(string)
+		desc, _ := art["description"].(string)
+
+		// truncate to 50 words
+		words := strings.Fields(desc)
+		if len(words) > 50 {
+			desc = strings.Join(words[:50], " ") + "…"
+		}
+
+		items = append(items, map[string]string{
+			"title":       title,
+			"description": desc,
+		})
+	}
+
+	// JSON‑encode for the Gemini prompt
+	dataJSON, _ := json.Marshal(items)
+	prompt := fmt.Sprintf(
+		"I'm giving you a news query and the news items. Answer the user in less than 30 words.\n"+
+			"QUERY: News for country code %s\nDATA: %s\n",
+		countryCode, string(dataJSON),
+	)
+
+	// Hand off to Gemini
+	return getResponseFromGemini(prompt)
 }
 
 // function to get a response from a Ollama model
