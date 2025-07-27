@@ -91,19 +91,32 @@ class Chat extends Component {
           if (
             this.state.username === msg.to
           ) {
+          
           // update UI only when message is between from and to
           var chatsArr = []
-          var singleMsg = {
-            from: msg.from,
-            to: msg.to,
-            encapsulated_key: msg.encapsulated_key,
-            encrypted_message: msg.encrypted_message,
-            iv: msg.iv,
-            timestamp: msg.timestamp,
-            id: msg.id,
-            decryptedMessage: '',
-          };
-          chatsArr.push(singleMsg);
+          if(msg.from == 'ChatBot') {
+            var singleMsg = {
+              from: msg.from,
+              to: msg.to,
+              message: msg.message,
+              timestamp: msg.timestamp,
+              id: msg.id,
+              decryptedMessage: '',
+            };
+            chatsArr.push(singleMsg);
+          } else {
+            var singleMsg = {
+              from: msg.from,
+              to: msg.to,
+              encapsulated_key: msg.encapsulated_key,
+              encrypted_message: msg.encrypted_message,
+              iv: msg.iv,
+              timestamp: msg.timestamp,
+              id: msg.id,
+              decryptedMessage: '',
+            };
+            chatsArr.push(singleMsg);
+          }
           const processedChatMessage = await this.processChats(
             chatsArr,
             this.state.kyberKeyPair.privateKey,
