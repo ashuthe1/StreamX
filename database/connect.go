@@ -71,7 +71,7 @@ func Connect() {
 		&models.ActivityEvent{},
 		&models.MyMessage{},
 	); err != nil {
-		log.Fatal("AutoMigrate failed:", err)
+		log.Println("AutoMigrate failed:", err)
 	}
 	log.Println("✅ Database migrated and ready")
 }
