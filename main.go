@@ -8,11 +8,13 @@ import (
 	"github.com/ashuthe1/streamx/database"
 	"github.com/ashuthe1/streamx/httpserver"
 	"github.com/ashuthe1/streamx/kafka"
+	"github.com/ashuthe1/streamx/msgqueue"
 	"github.com/ashuthe1/streamx/ws"
 )
 
 func main() {
 	database.Connect()
+	msgqueue.ConnectToRedis()
 
 	var wg sync.WaitGroup
 	wg.Add(3)

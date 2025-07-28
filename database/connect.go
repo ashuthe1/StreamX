@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/ashuthe1/streamx/models"
-	"github.com/ashuthe1/streamx/msgqueue"
 	"github.com/joho/godotenv"
 	redis "github.com/redis/go-redis/v9"
 	"gorm.io/driver/postgres"
@@ -40,7 +39,7 @@ func Connect() {
 		&models.MyMessage{},
 	)
 
-	msgqueue.ConnectoRabbitMQ()
+	// msgqueue.ConnectoRabbitMQ()
 
 	// wv.ConnectToWeaviate()
 

@@ -2,8 +2,8 @@ package httpserver
 
 import (
 	"log"
+	"os"
 
-	"github.com/ansrivas/fiberprometheus/v2"
 	"github.com/ashuthe1/streamx/chatbot"
 	"github.com/ashuthe1/streamx/handler"
 	"github.com/ashuthe1/streamx/middleware"
@@ -12,6 +12,14 @@ import (
 )
 
 func setupRoutes(app *fiber.App) {
+	// Health check endpoint
+	app.Get("/api/health", func(c *fiber.Ctx) error {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{
+			"status":        "ok",
+			"server_region": os.Getenv("SERVER_NAME"),
+		})
+	})
+
 	public := app.Group("/api")
 	public.Post("/register", handler.SignupHandler)
 	public.Post("/login", handler.LoginHandler)
@@ -37,11 +45,6 @@ func setupRoutes(app *fiber.App) {
 
 func StartHttpServer() {
 	app := fiber.New()
-
-	// Setup Prometheus for metrics collection
-	prometheus := fiberprometheus.New("streamx-service")
-	prometheus.RegisterAt(app, "/metrics")
-	app.Use(prometheus.Middleware)
 
 	app.Use(cors.New(cors.Config{
 		AllowOrigins:     "http://frontend:4000, http://localhost:4000, http://host.docker.internal:4000, http://34.93.176.4:4000, https://chat.gautamashutosh.com, https://ws.gautamashutosh.com, https://chatx.gautamashutosh.com, https://wsx.gautamashutosh.com ",
