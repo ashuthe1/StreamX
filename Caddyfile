@@ -1,22 +1,21 @@
-# Frontend on port 4000
-:4000 {
-    reverse_proxy frontend:4000
-}
-
-# HTTP API on port 3000, load‑balanced (round robin) across Asia & Europe backends
+# API reverse proxy (round robin between Asia and Europe backends)
 :3000 {
-    reverse_proxy /api /* {
-        to           http://app-asia:3000 http://app-europe:3000
-        lb_policy    round_robin
-        health_uri   /api/health
+    handle /api/* {
+        reverse_proxy {
+            to http://app-asia:3000 http://app-europe:3000
+            lb_policy round_robin
+            health_uri /api/health
+        }
     }
 }
 
-# WebSocket endpoint on port 3001, load‑balanced (round robin) across Asia & Europe backends
+# WebSocket reverse proxy (round robin)
 :3001 {
-    reverse_proxy /ws/* {
-        to           http://app-asia:3001 http://app-europe:3001
-        lb_policy    round_robin
-        health_uri   /api/health
+    handle /* {
+        reverse_proxy {
+            to http://app-asia:3001 http://app-europe:3001
+            lb_policy round_robin
+            health_uri /api/health
+        }
     }
 }

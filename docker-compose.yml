@@ -108,6 +108,8 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      - "3000:3000"
+      - "3001:3001"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
     depends_on:
