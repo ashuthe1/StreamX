@@ -43,7 +43,6 @@ var clients = struct {
 var presence PresenceService
 
 func init() {
-	msgqueue.ConnectToRedis() // initialize Redis once
 	onlineUsers := map[string]bool{}
 	presence = PresenceService{onlineUsers: onlineUsers, mu: &sync.Mutex{}}
 }
@@ -201,7 +200,7 @@ func StartWebSocketServer() {
 
 	app := fiber.New()
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "*",
+		AllowOrigins:     "http://frontend:4000, http://localhost:4000, http://host.docker.internal:4000, http://34.93.176.4:4000, https://chat.gautamashutosh.com, https://ws.gautamashutosh.com, https://chatx.gautamashutosh.com, https://wsx.gautamashutosh.com ",
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
 		AllowCredentials: true,
 	}))

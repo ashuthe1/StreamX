@@ -1,4 +1,3 @@
-version: '3.9'
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
@@ -7,6 +6,8 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
     ports:
       - "2181:2181"
+    networks:
+      - streamx-net
 
   kafka:
     image: confluentinc/cp-kafka:7.4.0
@@ -22,6 +23,8 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - streamx-net
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
@@ -33,6 +36,8 @@ services:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
       KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+    networks:
+      - streamx-net
 
   db:
     image: postgres:14
@@ -41,12 +46,18 @@ services:
       POSTGRES_PASSWORD: mysecretpassword
     volumes:
       - ${HOME}/data/postgresdata:/var/lib/postgresql/data
+    networks:
+      - streamx-net
 
   redis-db:
     image: redis:latest
     restart: always
+    ports:
+      - "6379:6379"         # expose Redis for local tooling if needed
+    networks:
+      - streamx-net
 
-  # Two backend replicas with distinct names, no RabbitMQ
+  # Two backend replicas
   app-asia:
     container_name: app-asia
     build:
@@ -56,6 +67,7 @@ services:
       - SERVER_NAME=Asia
       - REDIS_ADDR=redis-db:6379
       - KAFKA_ADDR=kafka:9092
+      - WS_PORT=3001
     depends_on:
       - kafka
       - db
@@ -72,6 +84,7 @@ services:
       - SERVER_NAME=Europe
       - REDIS_ADDR=redis-db:6379
       - KAFKA_ADDR=kafka:9092
+      - WS_PORT=3001
     depends_on:
       - kafka
       - db
@@ -80,10 +93,10 @@ services:
       - streamx-net
 
   frontend:
+    container_name: frontend
     build:
       context: ./
       dockerfile: frontend.dockerfile
-    container_name: frontend
     ports:
       - "4000:4000"
     networks:

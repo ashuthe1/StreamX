@@ -4,45 +4,25 @@ import (
 	"context"
 	"encoding/json"
 	"log"
-	"os"
-	"sync"
 
+	"github.com/ashuthe1/streamx/internal/redisclient"
 	"github.com/ashuthe1/streamx/models"
-	"github.com/redis/go-redis/v9"
 )
 
-var (
-	RedisClient *redis.Client
-	once        sync.Once
-)
-
-func ConnectToRedis() {
-	once.Do(func() {
-		addr := os.Getenv("REDIS_ADDR") // e.g. "redis-db:6379"
-		RedisClient = redis.NewClient(&redis.Options{
-			Addr: addr,
-		})
-		if _, err := RedisClient.Ping(context.Background()).Result(); err != nil {
-			log.Fatalf("redis ping failed: %v", err)
-		}
-		log.Println("✅ Connected to Redis")
-	})
-}
-
-// Publish a chat message onto the global pub/sub channel.
+// PublishChat publishes a chat message onto the global pub/sub channel.
 // Every instance will receive it, then filter by target user.
 func PublishChat(chat *models.Chat) error {
 	payload, err := json.Marshal(chat)
 	if err != nil {
 		return err
 	}
-	return RedisClient.Publish(context.Background(), "chat_broadcast", payload).Err()
+	return redisclient.Client.Publish(context.Background(), "chat_broadcast", payload).Err()
 }
 
-// Subscribe returns a channel of raw JSON messages from Redis global channel.
+// SubscribeChat returns a channel of *models.Chat coming from Redis.
+// Call redisclient.Init() early in your startup (e.g. in main or init) to ensure Client is ready.
 func SubscribeChat(ctx context.Context) (<-chan *models.Chat, error) {
-	pubsub := RedisClient.Subscribe(ctx, "chat_broadcast")
-	// Wait for confirmation that subscription is created
+	pubsub := redisclient.Client.Subscribe(ctx, "chat_broadcast")
 	if _, err := pubsub.Receive(ctx); err != nil {
 		return nil, err
 	}
