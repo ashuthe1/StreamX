@@ -1,22 +1,21 @@
-:4000 {
-    reverse_proxy frontend:4000
-}
+# API reverse proxy (round robin between Asia and Europe backends)
 :3000 {
-    reverse_proxy go-app:3000
+    handle /api/* {
+        reverse_proxy {
+            to http://app-asia:3000 http://app-europe:3000
+            lb_policy round_robin
+            health_uri /api/health
+        }
+    }
 }
 
+# WebSocket reverse proxy (round robin)
 :3001 {
-    reverse_proxy go-app:3001
+    handle /* {
+        reverse_proxy {
+            to http://app-asia:3001 http://app-europe:3001
+            lb_policy round_robin
+            health_uri /api/health
+        }
+    }
 }
-
-# chat.gautamashutosh.com {
-#     reverse_proxy frontend:4000
-# }
-
-# api.gautamashutosh.com {
-#     reverse_proxy go-app:3000
-# }
-
-# ws.gautamashutosh.com {
-#     reverse_proxy go-app:3001
-# }

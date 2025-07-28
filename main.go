@@ -7,12 +7,14 @@ import (
 	"github.com/ashuthe1/streamx/chatbot"
 	"github.com/ashuthe1/streamx/database"
 	"github.com/ashuthe1/streamx/httpserver"
+	"github.com/ashuthe1/streamx/internal/redisclient"
 	"github.com/ashuthe1/streamx/kafka"
 	"github.com/ashuthe1/streamx/ws"
 )
 
 func main() {
 	database.Connect()
+	redisclient.Init()
 
 	var wg sync.WaitGroup
 	wg.Add(3)

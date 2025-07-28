@@ -1,29 +1,27 @@
 package online
 
-import "context"
+import (
+	"context"
+
+	"github.com/ashuthe1/streamx/internal/redisclient"
+)
 
 const onlineUserKey = "online_users"
 
 func AddUserToRedis(username string) error {
-	res := RedisClient.SAdd(context.Background(), onlineUserKey, username)
-	if res.Err() != nil {
-		return res.Err()
-	}
-
-	return nil
+	res := redisclient.Client.SAdd(context.Background(), onlineUserKey, username)
+	return res.Err()
 }
 
 func DeleteUserFromRedis(username string) error {
-	res := RedisClient.SRem(context.Background(), onlineUserKey, username)
-
+	res := redisclient.Client.SRem(context.Background(), onlineUserKey, username)
 	return res.Err()
 }
 
 func IsUserOnline(username string) bool {
-	res := RedisClient.SIsMember(context.Background(), onlineUserKey, username)
-	return res.Val()
+	return redisclient.Client.SIsMember(context.Background(), onlineUserKey, username).Val()
 }
 
 func GetTotalOnlineUsers() int {
-	return len(RedisClient.SMembers(context.Background(), onlineUserKey).Val())
+	return len(redisclient.Client.SMembers(context.Background(), onlineUserKey).Val())
 }

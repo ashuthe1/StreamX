@@ -3,64 +3,75 @@ package database
 import (
 	"log"
 	"os"
+	"time"
 
 	"github.com/ashuthe1/streamx/models"
-	"github.com/ashuthe1/streamx/msgqueue"
 	"github.com/joho/godotenv"
-	redis "github.com/redis/go-redis/v9"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 var DB *gorm.DB
-var RedisClient *redis.Client
 
 func Connect() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error load .env file")
+	// load .env
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Error loading .env file:", err)
 	}
 	dsn := os.Getenv("DSN")
-
-	database, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		log.Println("***********************FAIL******************* ")
-		panic("Could not connect to the database")
-	} else {
-		log.Println("connect to postgres successfully")
+	if dsn == "" {
+		log.Fatal("DSN env var is empty")
 	}
 
-	log.Println("***********************CONNECTED TO POSTGRES DATABASE******************* ")
-	DB = database
-	database.AutoMigrate(
+	const (
+		maxRetries = 7
+		baseDelay  = 2 * time.Second
+	)
+
+	var db *gorm.DB
+	var err error
+	delay := baseDelay
+
+	for i := 1; i <= maxRetries; i++ {
+		db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{
+			// Optional: suppress GORM's verbose logger
+			Logger: logger.Default.LogMode(logger.Silent),
+		})
+		if err == nil {
+			sqlDB, errPing := db.DB()
+			if errPing == nil {
+				// ping to ensure database is really up
+				if pingErr := sqlDB.Ping(); pingErr == nil {
+					log.Println("✅ Connected to Postgres on attempt", i)
+					break
+				} else {
+					err = pingErr
+				}
+			} else {
+				err = errPing
+			}
+		}
+
+		log.Printf("Postgres connect attempt %d/%d failed: %v", i, maxRetries, err)
+		if i == maxRetries {
+			log.Fatal("🚨 Could not connect to the database after retries:", err)
+		}
+		time.Sleep(delay)
+		delay *= 2
+	}
+
+	DB = db
+
+	log.Println("🔄 Running AutoMigrate...")
+	if err := DB.AutoMigrate(
 		&models.User{},
 		&models.Chat{},
 		&models.ContactList{},
 		&models.ActivityEvent{},
 		&models.MyMessage{},
-	)
-
-	msgqueue.ConnectoRabbitMQ()
-
-	// wv.ConnectToWeaviate()
-
-	// redisAddress := os.Getenv("REDIS_ADDRESS")
-	// rdb := redis.NewClient(&redis.Options{
-	// 	Addr:     redisAddress,
-	// 	Password: "", // no password set
-	// 	DB:       0,  // use default DB
-	// })
-
-	// ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-	// defer cancel()
-
-	// _, err = rdb.Ping(ctx).Result()
-	// if err != nil {
-	// 	fmt.Println("Error connecting to Redis:", err)
-	// 	return
-	// }
-	// log.Println("***********************CONNECTED TO REDIS********************* ")
-
-	// RedisClient = rdb
-
+	); err != nil {
+		log.Println("AutoMigrate failed:", err)
+	}
+	log.Println("✅ Database migrated and ready")
 }
