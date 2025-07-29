@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/base64"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -42,7 +41,7 @@ func RegisterPublicKeyHandler(c *fiber.Ctx) error {
 
 	// Update the user's public key.
 	user.PublicKey = publicKeyBytes
-	fmt.Println("user: ", user)
+	// fmt.Println("user: ", user)
 	if err := database.DB.Save(&user).Error; err != nil {
 		log.Printf("Error saving public key for user %s: %v", req.Username, err)
 		c.Status(http.StatusInternalServerError)
@@ -59,14 +58,14 @@ func RegisterPublicKeyHandler(c *fiber.Ctx) error {
 func GetPublicKeyHandler(c *fiber.Ctx) error {
 	username := c.Query("user")
 	if username == "" {
-		log.Printf("Username query parameter missing")
+		// log.Printf("Username query parameter missing")
 		c.Status(fiber.StatusBadRequest)
 		return c.JSON(fiber.Map{"error": "Username is required"})
 	}
 
 	user, err := GetUserByUsername(username)
 	if err != nil {
-		log.Printf("User %s not found: %v", username, err)
+		// log.Printf("User %s not found: %v", username, err)
 		c.Status(fiber.StatusNotFound)
 		return c.JSON(fiber.Map{"error": "User not found"})
 	}
@@ -77,11 +76,11 @@ func GetPublicKeyHandler(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{"error": "Public key not found for user"})
 	}
 
-	fmt.Println("user publicKey: ", user.PublicKey)
+	// fmt.Println("user publicKey: ", user.PublicKey)
 	// Encode the public key to Base64 before sending.
 	publicKeyBase64 := base64.StdEncoding.EncodeToString(user.PublicKey)
-	fmt.Println("user, publicKeyBase64: ", publicKeyBase64)
+	// fmt.Println("user, publicKeyBase64: ", publicKeyBase64)
 
-	log.Printf("Fetched public key for user: %s", username)
+	// log.Printf("Fetched public key for user: %s", username)
 	return c.Status(http.StatusOK).JSON(fiber.Map{"publicKey": publicKeyBase64})
 }

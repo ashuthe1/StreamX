@@ -58,18 +58,14 @@ func ChatHistoryHandler(c *fiber.Ctx) error {
 
 	allChats, err := GetAllChatSentByU1ToU2(u1, u2)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			c.Status(200)
-			return c.JSON(fiber.Map{
-				"message": fmt.Sprintf("No chat history found between %s and %s", u1, u2),
-			})
+		if err != gorm.ErrRecordNotFound {
+			c.Status(http.StatusInternalServerError)
+			return c.JSON(fiber.Map{"message": fmt.Sprintf("error: %v", err.Error())})
 		}
-		c.Status(http.StatusInternalServerError)
-		return c.JSON(fiber.Map{"message": fmt.Sprintf("error: %v", err.Error())})
 	}
 
-	// Add ChatBot welcome message if the receiver is ChatBot.
-	if u2 == "ChatBot" {
+	// Add ChatBot welcome message if the sender is ChatBot.
+	if u1 == "ChatBot" {
 		chatBotIntroText := `Hello! I'm streamx's AI assistant, ready to enhance your chat experience. Here's how I can help you:
 
 - Get real-time weather updates for any city
@@ -82,8 +78,8 @@ I'm constantly learning and evolving. Stay tuned for exciting new capabilities c
 How can I assist you today?`
 
 		msg := models.Chat{
-			From:      u2,
-			To:        u1,
+			From:      u1,
+			To:        u2,
 			Msg:       chatBotIntroText,
 			Timestamp: time.Now().Unix(),
 		}

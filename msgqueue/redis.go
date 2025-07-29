@@ -20,7 +20,6 @@ func PublishChat(chat *models.Chat) error {
 }
 
 // SubscribeChat returns a channel of *models.Chat coming from Redis.
-// Call redisclient.Init() early in your startup (e.g. in main or init) to ensure Client is ready.
 func SubscribeChat(ctx context.Context) (<-chan *models.Chat, error) {
 	pubsub := redisclient.Client.Subscribe(ctx, "chat_broadcast")
 	if _, err := pubsub.Receive(ctx); err != nil {
