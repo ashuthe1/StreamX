@@ -1,61 +1,83 @@
-import React from 'react';
-import { Text, Box, Flex, Icon, VStack } from '@chakra-ui/react';
-import { FaFileDownload } from 'react-icons/fa';
+"use client"
+import { motion } from "framer-motion"
+import { Box, Flex, Avatar, Text, VStack } from "@chakra-ui/react"
+
+const MotionBox = motion(Box)
 
 const ChatHistory = (currentUser, chats) => {
-  const handleFileDownload = (url, fileName) => {
-    fetch(url)
-      .then(response => response.blob())
-      .then(blob => {
-        const downloadUrl = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = downloadUrl;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(downloadUrl);
-      })
-      .catch(() => alert('An error occurred while downloading the file.'));
-  };
+  return (
+    <VStack spacing={4} align="stretch" p={2}>
+      {chats.map((chat, index) => {
+        const isCurrentUser = chat.from === currentUser
+        const displayMessage = chat.decryptedMessage || chat.message || "Message could not be decrypted"
 
-  const history = chats.map(m => {
-    const isCurrentUser = m.from === currentUser;
-    const alignSelf = isCurrentUser ? 'flex-end' : 'flex-start';
-    const bg = isCurrentUser ? 'purple.500' : 'gray.600';
-    const textAlign = isCurrentUser ? 'right' : 'left';
-    const ts = new Date(m.timestamp * 1000);
+        return (
+          <MotionBox
+            key={`${chat.timestamp}-${index}`}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: index * 0.1 }}
+          >
+            <Flex justify={isCurrentUser ? "flex-end" : "flex-start"} align="end" mb={2}>
+              {!isCurrentUser && (
+                <Avatar
+                  name={chat.from}
+                  size="sm"
+                  mr={2}
+                  border="2px solid"
+                  borderColor={chat.from === "ChatBot" ? "purple.300" : "yellow.300"}
+                />
+              )}
 
-    return (
-      <Box key={m.id} alignSelf={alignSelf} maxWidth="70%" mb={4}>
-        <Flex direction="column" bg={bg} p={3} borderRadius="lg" boxShadow="md">
-          {/* Display the decrypted message if available, otherwise fallback to plain message */}
-          <Text color="white" textAlign={textAlign} wordBreak="break-word">
-            {m.decryptedMessage ? m.decryptedMessage : m.message}
-          </Text>
-          {m.file_url && (
-            <Flex align="center" mt={2} justify={isCurrentUser ? 'flex-end' : 'flex-start'}>
-              <Icon
-                as={FaFileDownload}
-                color="white"
-                cursor="pointer"
-                onClick={() => handleFileDownload(m.file_url, m.file_name)}
-                mr={2}
-              />
-              <Text fontSize="xs" color="gray.300">
-                {m.file_name}
-              </Text>
+              <MotionBox maxW="70%" whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
+                <Box
+                  bg={
+                    isCurrentUser
+                      ? "linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)"
+                      : chat.from === "ChatBot"
+                        ? "linear-gradient(135deg, #e6e6fa 0%, #f0f8ff 100%)"
+                        : "gray.100"
+                  }
+                  color={isCurrentUser ? "gray.800" : "gray.700"}
+                  p={3}
+                  borderRadius="lg"
+                  borderTopRightRadius={isCurrentUser ? "sm" : "lg"}
+                  borderTopLeftRadius={isCurrentUser ? "lg" : "sm"}
+                  boxShadow="sm"
+                  border="1px solid"
+                  borderColor={isCurrentUser ? "yellow.300" : chat.from === "ChatBot" ? "purple.200" : "gray.200"}
+                >
+                  {!isCurrentUser && (
+                    <Text fontSize="xs" fontWeight="bold" mb={1} color="gray.600">
+                      {chat.from}
+                    </Text>
+                  )}
+                  <Text fontSize="sm" lineHeight="1.4">
+                    {displayMessage}
+                  </Text>
+                  <Text
+                    fontSize="xs"
+                    color={isCurrentUser ? "gray.600" : "gray.500"}
+                    mt={1}
+                    textAlign={isCurrentUser ? "right" : "left"}
+                  >
+                    {new Date(chat.timestamp * 1000).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </Text>
+                </Box>
+              </MotionBox>
+
+              {isCurrentUser && (
+                <Avatar name={chat.from} size="sm" ml={2} border="2px solid" borderColor="yellow.300" />
+              )}
             </Flex>
-          )}
-          <Text as="sub" fontSize="xs" color="gray.300" mt={2} alignSelf={isCurrentUser ? 'flex-end' : 'flex-start'}>
-            {ts.toLocaleTimeString()}
-          </Text>
-        </Flex>
-      </Box>
-    );
-  });
+          </MotionBox>
+        )
+      })}
+    </VStack>
+  )
+}
 
-  return <VStack spacing={4} align="stretch" w="100%">{history}</VStack>;
-};
-
-export default ChatHistory;
+export default ChatHistory
